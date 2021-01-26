@@ -42,6 +42,8 @@ Launch the `run.sh` script
 ./run.sh
 ```
 
+OpenJDK 8 is installed in `/usr/lib/jvm/java-8-openjdk-amd64` (for use in Java Designer module's parameters).
+
 # Sources
 
 - this is a simple update from [https://github.com/GehDoc/docker-modelio](https://github.com/GehDoc/docker-modelio) with no use of the user's UID/GID
