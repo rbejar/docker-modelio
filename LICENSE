@@ -1,6 +1,7 @@
 The MIT License (MIT)
 
 Copyright (c) 2019 Gérald Hameau
+Copyright (c) 2021 Pascal Poizat (update to Modelio 4.1.0 + no use of UID/GID)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
