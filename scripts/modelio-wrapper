@@ -143,7 +143,6 @@ echo "Starting ${prog}..."
   # --device /dev/dri \
 #  --privileged \
 ${SUDO} docker run -it \
-  --privileged \
   --cpus ${CPUS} \
   ${ENV_VARS} \
   ${VOLUMES} \
