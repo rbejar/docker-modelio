@@ -24,8 +24,9 @@ RUN apt-get update
 RUN apt-get -qy dist-upgrade
 
 RUN apt-get install -qy --no-install-recommends \
-    wget sudo libwebkit2gtk-4.0-37
-
+    wget sudo \
+    libgtk-3-0 libwebkit2gtk-4.0-37
+    
 RUN mkdir /modelio && \
     cd /modelio && \
     wget -nv --show-progress --progress=bar:force:noscroll -O modelio.tar.gz https://github.com/ModelioOpenSource/Modelio/releases/download/v4.1.0/Modelio.4.1.0.-.Linux.tar.gz && \

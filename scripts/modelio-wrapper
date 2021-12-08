@@ -11,7 +11,7 @@ DOCKERIMAGE=docker-modelio:latest
 # * 2.0 : slow
 # * 3.0 : convenient
 # * 4.0 : comfortable
-CPUS=2.0
+#CPUS=2.0
 
 PATH=/usr/sbin:/usr/bin:/sbin:/bin
 MODELIO_USER=modelio
@@ -142,8 +142,8 @@ echo "Starting ${prog}..."
   # ${VIDEO_DEVICES} \
   # --device /dev/dri \
 #  --privileged \
+#  --cpus ${CPUS} \
 ${SUDO} docker run -it \
-  --cpus ${CPUS} \
   ${ENV_VARS} \
   ${VOLUMES} \
   ${MODELIO_EXTRA_DOCKER_ARGUMENTS} \
