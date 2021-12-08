@@ -1,35 +1,39 @@
-# modelio-4.1.0 on ubuntu 16.04
+# modelio-4.1.0 on Debian-based image
 #
 # WARNING : PLEASE READ README.md
 #
-FROM ubuntu:16.04
-LABEL maintainer="gerald.hameau@gmail.com"
+# References:
+#   https://github.com/pascalpoizat/docker-modelio
+#   https://github.com/mdouchement/docker-zoom-us
+#   https://github.com/sameersbn/docker-skype
+
+#FROM ubuntu:16.04
+FROM openjdk:11.0.12-slim-bullseye
+
+# Based on that initial version, and Pascal Poizat's
+#LABEL maintainer="gerald.hameau@gmail.com"
+LABEL maintainer="olivier.berger@telecom-sudparis.eu"
+
+ENV DEBIAN_FRONTEND noninteractive
 
 ARG USER_ID=1000
 ARG GROUP_ID=1000
 
 # System
-RUN apt-get update && \
-    apt-get install -y wget && \
-    # using Oracle Java 8 is no longer poossible
-    # apt-get install -y software-properties-common && \
-    # add-apt-repository ppa:webupd8team/java && \
-    # apt-get install -y oracle-java8-installer && \
-    # so we use OpenJDK8
-    apt-get install -y openjdk-8-jdk openjdk-8-jre && \
-    mkdir /modelio && \
-    wget -nv --show-progress --progress=bar:force:noscroll -O /modelio/modelio.deb https://sourceforge.net/projects/modeliouml/files/4.1.0/modelio-open-source_4.1.0_ubuntu_amd64.deb && \
-    apt-get install -y /modelio/modelio.deb && \
-    rm /modelio/modelio.deb
+RUN apt-get update
+RUN apt-get -qy dist-upgrade
 
-RUN mkdir -p /home/developer && \
-    if [ ${USER_ID:-0} -ne 0 ] && [ ${GROUP_ID:-0} -ne 0 ]; then \
-        groupadd -g ${GROUP_ID} developer && \
-        useradd -l -u ${USER_ID} -g developer developer \
-    ;fi && \
-    chown ${USER_ID}:${GROUP_ID} -R /home/developer
+RUN apt-get install -qy --no-install-recommends \
+    wget sudo libwebkit2gtk-4.0-37
 
-USER developer
-ENV HOME /home/developer
+RUN mkdir /modelio && \
+    cd /modelio && \
+    wget -nv --show-progress --progress=bar:force:noscroll -O modelio.tar.gz https://github.com/ModelioOpenSource/Modelio/releases/download/v4.1.0/Modelio.4.1.0.-.Linux.tar.gz && \
+    tar xfz modelio.tar.gz && \
+    rm -rf modelio.tar.gz
 
-CMD /usr/bin/modelio-open-source4.1
+COPY scripts/ /var/cache/drawio/
+COPY entrypoint.sh /sbin/entrypoint.sh
+RUN chmod 755 /sbin/entrypoint.sh
+
+ENTRYPOINT ["/sbin/entrypoint.sh"]

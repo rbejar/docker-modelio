@@ -1,0 +1,146 @@
+#!/bin/bash
+
+# Wrapper that starts the docker run with appropriate bind mounts, etc.
+
+#set -x
+
+#DOCKERIMAGE=olberger/docker-modelio:latest
+DOCKERIMAGE=docker-modelio:latest
+
+PATH=/usr/sbin:/usr/bin:/sbin:/bin
+MODELIO_USER=modelio
+
+# do we need to use sudo to start docker containers?
+( id -Gn | grep -q docker ) || SUDO=sudo
+
+USER_UID=$(id -u)
+USER_GID=$(id -g)
+
+XSOCK=/tmp/.X11-unix
+XAUTH=/tmp/.docker.xauth
+
+DOWNLOAD_DIR=$(xdg-user-dir DOWNLOAD)
+if [ -z "${DOWNLOAD_DIR}" ]; then
+    DOWNLOAD_DIR="${HOME}/Downloads"
+fi;
+DOCUMENTS_DIR=$(xdg-user-dir DOCUMENTS)
+if [ -z "${DOCUMENTS_DIR}" ]; then
+    DOCUMENTS_DIR="${HOME}/Documents"
+fi;
+
+list_commands() {
+  echo ""
+  echo "Launch modelio using:"
+#  echo "  modelio                        OR "
+  echo "  modelio-wrapper bash"
+  echo ""
+  exit 1
+}
+
+cleanup_stopped_modelio_instances(){
+  echo "Cleaning up stopped modelio instances..."
+  for c in $(${SUDO} docker ps -a -q)
+  do
+    image="$(${SUDO} docker inspect -f {{.Config.Image}} ${c})"
+    if [ "${image}" == "${DOCKERIMAGE}" ]; then
+      running=$(${SUDO} docker inspect -f {{.State.Running}} ${c})
+      if [ "${running}" != "true" ]; then
+        ${SUDO} docker rm "${c}" >/dev/null
+      fi
+    fi
+  done
+}
+
+prepare_docker_env_parameters() {
+  ENV_VARS+=" --env=USER_UID=${USER_UID}"
+  ENV_VARS+=" --env=USER_GID=${USER_GID}"
+  ENV_VARS+=" --env=DISPLAY=unix$DISPLAY"
+  ENV_VARS+=" --env=XAUTHORITY=${XAUTH}"
+  ENV_VARS+=" --env=TZ=$(date +%Z)"
+}
+
+prepare_docker_volume_parameters() {
+  touch ${XAUTH}
+  xauth nlist :0 | sed -e 's/^..../ffff/' | xauth -f ${XAUTH} nmerge -
+
+  if [[ -z "${MODELIO_HOME}" ]]; then
+      MODELIO_HOME=${HOME} # Default directory
+      CURDIR=`pwd`
+  else
+      CURDIR=${MODELIO_HOME}
+    DOWNLOAD_DIR=${DOWNLOAD_DIR/$HOME/$MODELIO_HOME}
+    DOCUMENTS_DIR=${DOCUMENTS_DIR/$HOME/$MODELIO_HOME}
+    mkdir -p {$DOWNLOAD_DIR,$DOCUMENTS_DIR}
+
+#    mkdir -p ${MODELIO_HOME}/{.config,.cache}
+    mkdir -p ${MODELIO_HOME}/.config
+  fi
+
+  mkdir -p ${DOCUMENTS_DIR}/ModelioWorkspace
+  
+#  mkdir -p ${CURDIR}/diagrams-from-host
+  
+  echo "Using MODELIO_HOME: ${MODELIO_HOME}"
+
+#  VOLUMES+=" --volume=${CURDIR}/diagrams-from-host:/home/${MODELIO_USER}/diagrams-from-host"
+  VOLUMES+=" --volume=${MODELIO_HOME}/.modelio:/home/${MODELIO_USER}/.modelio"
+  # VOLUMES+=" --volume=${DOWNLOAD_DIR}:/home/${MODELIO_USER}/Downloads"
+  # VOLUMES+=" --volume=${DOCUMENTS_DIR}:/home/${MODELIO_USER}/Documents"
+  VOLUMES+=" --volume=${DOCUMENTS_DIR}/ModelioWorkspace:/home/${MODELIO_USER}/modelio/workspace"
+  VOLUMES+=" --volume=${XSOCK}:${XSOCK}"
+  VOLUMES+=" --volume=${XAUTH}:${XAUTH}"
+#  VOLUMES+=" --volume=/run/user/${USER_UID}/pulse:/run/pulse"
+}
+
+prepare_docker_device_parameters() {
+  # enumerate video devices for webcam support
+  VIDEO_DEVICES=
+  for device in /dev/video*
+  do
+    if [ -c $device ]; then
+      VIDEO_DEVICES="${VIDEO_DEVICES} --device $device:$device"
+    fi
+  done
+}
+
+prog=$(basename $0)
+exec=$(which $prog)
+
+if [[ ${prog} == "modelio-wrapper" ]]; then
+  case ${1} in
+    # modelio)
+    #   prog=${1}
+    #   shift
+    #   ;;
+    bash)
+      prog=${1}
+      shift
+      ;;
+    *|help)
+      list_commands
+      exit 1
+      ;;
+  esac
+elif [[ -n ${exec} ]]; then
+    # launch host binary if it exists
+    exec ${exec} $@
+fi
+
+cleanup_stopped_modelio_instances
+prepare_docker_env_parameters
+prepare_docker_volume_parameters
+#prepare_docker_device_parameters
+
+echo "Starting ${prog}..."
+#${SUDO} docker run -d \
+  # ${VIDEO_DEVICES} \
+  # --device /dev/dri \
+${SUDO} docker run -it \
+  --privileged \
+  ${ENV_VARS} \
+  ${VOLUMES} \
+  ${MODELIO_EXTRA_DOCKER_ARGUMENTS} \
+  --name modelio \
+  ${DOCKERIMAGE} ${prog} $@
+
+#>/dev/null

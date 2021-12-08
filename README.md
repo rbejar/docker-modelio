@@ -1,18 +1,18 @@
-[Modelio](https://www.modelio.org) 4.1.0 in a docker container (for macOS)
+[Modelio](https://www.modelio.org) 4.1.0 in a docker container (initially for macOS, and now for Linux)
 
 # WARNINGS
 
 * Once Launched :
     * The host shares X11 socket and IPC with the container  
     => This breaks container isolation, and the contained app can listen to all X11 events !
-    * **The host shares your ~/.modelio/ and ~/modelio/ folders with the container.**
+    * **The host shares your ~/.modelio/ and ~/Documents/ModelioWorkspace/ folders with the container.**
 * Use it at your own risk !
 # Requirements
 
 * Docker (https://www.docker.com) running
 * X11 (tested with https://www.xquartz.org on macOS Catalina 10.15.7) running
 
-# Setup (perform once)
+# Setup on Mac (perform once)
 
 1. launch XQuartz
 2. in Preferences -> Security check "Authenticate connections" and "Allow connections from network clients"
@@ -25,9 +25,9 @@
     ```sh
     cd docker-modelio
     ```
-6. build
+6. build (optional)
     ```sh
-    docker build --rm -f "Dockerfile" -t modelio:latest .
+    docker build --tag docker-modelio:latest .
     ```
 7. enable the `run.sh` script to be run
     ```sh
@@ -39,12 +39,14 @@
 Launch the `run.sh` script
 
 ```sh
-./run.sh
+./scripts/modelio-wrapper bash
 ```
+Then launch modelio (twice if it triggers an error at first launch)
 
-OpenJDK 8 is installed in `/usr/lib/jvm/java-8-openjdk-amd64` (for use in Java Designer module's parameters).
+OpenJDK 11 is installed in `/usr/local/openjdk-11` (for use in Java Designer module's parameters).
 
 # Sources
 
 - this is a simple update from [https://github.com/GehDoc/docker-modelio](https://github.com/GehDoc/docker-modelio) with no use of the user's UID/GID
 - solution to access the X11 display from [https://medium.com/@mreichelt/how-to-show-x11-windows-within-docker-on-mac-50759f4b65cb](https://medium.com/@mreichelt/how-to-show-x11-windows-within-docker-on-mac-50759f4b65cb)
+- improved by Olivier Berger to create user at runtime and avoid rebuilding to tacke uid/gid into account, inspired by https://github.com/mdouchement/docker-zoom-us
