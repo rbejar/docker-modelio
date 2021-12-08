@@ -45,6 +45,21 @@ Then launch modelio (twice if it triggers an error at first launch)
 
 OpenJDK 11 is installed in `/usr/local/openjdk-11` (for use in Java Designer module's parameters).
 
+# Perfs issues
+
+Due to [performance issue with
+GTK3](https://github.com/ModelioOpenSource/Modelio/issues/11), the
+`docker run` command launched by the wrapper limits CPU usage. On a
+host with 8 cores (`lscpu` command), here follows the behaviour with
+some values of CPU usage:
+
+* 1.5 (core) : too slow, unusable
+* 2.0 : slow
+* 3.0 : convenient
+* 4.0 : comfortable
+
+Adjust the `CPUS=` variable definition in `modelio-wraper` script, depending on your needs.
+
 # Sources
 
 - this is a simple update from [https://github.com/GehDoc/docker-modelio](https://github.com/GehDoc/docker-modelio) with no use of the user's UID/GID
