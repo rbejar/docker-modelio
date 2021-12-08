@@ -32,6 +32,9 @@ RUN mkdir /modelio && \
     tar xfz modelio.tar.gz && \
     rm -rf modelio.tar.gz
 
+RUN mkdir -p /etc/modelio-open-source4.1
+COPY modelio.config /etc/modelio-open-source4.1
+
 COPY scripts/ /var/cache/drawio/
 COPY entrypoint.sh /sbin/entrypoint.sh
 RUN chmod 755 /sbin/entrypoint.sh
