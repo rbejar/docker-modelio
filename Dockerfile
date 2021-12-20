@@ -32,7 +32,7 @@ RUN mkdir /modelio && \
     tar xfz modelio.tar.gz && \
     rm -rf modelio.tar.gz
 
-COPY scripts/ /var/cache/drawio/
+COPY scripts/ /var/cache/modelio/
 COPY entrypoint.sh /sbin/entrypoint.sh
 RUN chmod 755 /sbin/entrypoint.sh
 
