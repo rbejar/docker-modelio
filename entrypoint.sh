@@ -77,7 +77,7 @@ case "$1" in
     create_user
     #grant_access_to_video_devices
     echo "$1"
-    echo "launch Modelio by invoking 'modelio' at the bash prompt:"
+    echo "launch Modelio by invoking 'modelio.sh' at the bash prompt:"
     launch_bash $@
     ;;
   # *)
