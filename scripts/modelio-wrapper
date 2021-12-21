@@ -82,7 +82,7 @@ prepare_docker_volume_parameters() {
     mkdir -p ${SOCUMENTS_DIR}
 
 #    mkdir -p ${MODELIO_HOME}/{.config,.cache}
-    mkdir -p ${MODELIO_HOME}/.config
+    mkdir -p ${MODELIO_HOME}/.modelio
   fi
 
   mkdir -p ${DOCUMENTS_DIR}/ModelioWorkspace
