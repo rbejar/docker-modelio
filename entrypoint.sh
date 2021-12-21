@@ -66,6 +66,7 @@ launch_bash() {
   exec sudo -HEu ${MODELIO_USER} /bin/bash
 }
 
+echo "Inside the running container..."
 case "$1" in
   install)
     install_modelio
@@ -76,11 +77,14 @@ case "$1" in
   *|bash)
     create_user
     #grant_access_to_video_devices
-    echo "$1"
-    echo "launch Modelio by invoking 'modelio.sh' at the bash prompt:"
+    #echo "$1"
+    echo "You can now launch Modelio by invoking 'modelio.sh' at the bash prompt, and quit with 'exit' at the end."
     launch_bash $@
     ;;
   # *)
   #   exec $@
   #;;
 esac
+
+# Never displayed cause of exec
+#echo "Terminating the container..."

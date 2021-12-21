@@ -94,6 +94,8 @@ prepare_docker_volume_parameters() {
   # VOLUMES+=" --volume=${DOWNLOAD_DIR}:/home/${MODELIO_USER}/Downloads"
   # VOLUMES+=" --volume=${DOCUMENTS_DIR}:/home/${MODELIO_USER}/Documents"
   VOLUMES+=" --volume=${DOCUMENTS_DIR}/ModelioWorkspace:/home/${MODELIO_USER}/modelio/workspace"
+  echo "Mounting '${DOCUMENTS_DIR}/ModelioWorkspace' on the host into '/home/${MODELIO_USER}/modelio/workspace' on the guest"
+
   VOLUMES+=" --volume=${XSOCK}:${XSOCK}"
   VOLUMES+=" --volume=${XAUTH}:${XAUTH}"
 #  VOLUMES+=" --volume=/run/user/${USER_UID}/pulse:/run/pulse"
@@ -138,7 +140,7 @@ prepare_docker_env_parameters
 prepare_docker_volume_parameters
 #prepare_docker_device_parameters
 
-echo "Starting ${prog}..."
+echo "Starting ${prog} inside the container..."
 #${SUDO} docker run -d \
   # ${VIDEO_DEVICES} \
   # --device /dev/dri \
@@ -152,3 +154,6 @@ ${SUDO} docker run -it \
   ${DOCKERIMAGE} ${prog} $@
 
 #>/dev/null
+
+# Never displayed cause of exec
+echo "Container execution terminaied."
