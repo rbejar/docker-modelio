@@ -37,7 +37,7 @@ create_user() {
       --gecos 'Modelio' ${MODELIO_USER} >/dev/null 2>&1
   fi
   chown ${MODELIO_USER}:${MODELIO_USER} -R /home/${MODELIO_USER}
-  adduser ${MODELIO_USER} sudo
+  adduser ${MODELIO_USER} sudo >/dev/null 2>&1
 }
 
 grant_access_to_video_devices() {
