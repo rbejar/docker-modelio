@@ -10,7 +10,7 @@ DOCKERIMAGE=olberger/docker-modelio:latest
 # * 2.0 : slow
 # * 3.0 : convenient
 # * 4.0 : comfortable
-#CPUS=2.0
+CPUS=2.0
 
 PATH=/usr/sbin:/usr/bin:/sbin:/bin
 MODELIO_USER=modelio
@@ -114,6 +114,15 @@ prepare_docker_device_parameters() {
   done
 }
 
+prepare_cpus_parameters() {
+    if [ "${CPUS}" != "0" ]; then
+        echo "Limiting to ${CPUS} cpus for the container"
+        CPU_OPT="--cpus ${CPUS}"
+    else
+        echo "Warning: No limit set on cpus for the container"
+    fi
+}
+
 cpus=
 modelio_home=
 
@@ -177,14 +186,15 @@ cleanup_stopped_modelio_instances
 prepare_docker_env_parameters
 prepare_docker_volume_parameters
 #prepare_docker_device_parameters
+prepare_cpus_parameters
 
 echo "Starting ${prog} inside the container..."
 #${SUDO} docker run -d \
   # ${VIDEO_DEVICES} \
   # --device /dev/dri \
 #  --privileged \
-#  --cpus ${CPUS} \
 ${SUDO} docker run -it \
+  ${CPU_OPT} \
   ${ENV_VARS} \
   ${VOLUMES} \
   ${MODELIO_EXTRA_DOCKER_ARGUMENTS} \
