@@ -4,8 +4,7 @@
 
 #set -x
 
-#DOCKERIMAGE=olberger/docker-modelio:latest
-DOCKERIMAGE=docker-modelio:latest
+DOCKERIMAGE=olberger/docker-modelio:latest
 
 # * 1.5 (core) : too slow, unusable
 # * 2.0 : slow
