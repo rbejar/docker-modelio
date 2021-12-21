@@ -165,7 +165,7 @@ if [[ ${prog} == "modelio-wrapper" ]]; then
       ;;
     *|help)
       list_commands
-      exit 1
+      exit 0
       ;;
   esac
 elif [[ -n ${exec} ]]; then
