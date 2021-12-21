@@ -34,12 +34,15 @@ if [ -z "${DOCUMENTS_DIR}" ]; then
 fi;
 
 list_commands() {
-  echo ""
-  echo "Launch modelio using:"
-#  echo "  modelio                        OR "
-  echo "  modelio-wrapper bash"
-  echo ""
-  exit 1
+cat << EOF
+Launch modelio using:
+ modelio-wrapper [options] bash
+
+OPTIONS:
+   -c NB_CPUS                       Limit to NB_CPUS the CPU usage (default: $CPUS, 0: unlimited)
+   -p MODELIO_HOME                  Specify a prefix for host directories mounted inside the container (default: \$HOME)
+   -h                               Show this message
+EOF
 }
 
 cleanup_stopped_modelio_instances(){
@@ -110,6 +113,42 @@ prepare_docker_device_parameters() {
     fi
   done
 }
+
+cpus=
+modelio_home=
+
+while getopts 'hc:p:' OPTION; do
+    case $OPTION in
+        'c')
+            cpus=${OPTARG}
+            if [[ -z "${cpus##*[!0-9]*}" ]] ; then
+                echo "Invalid argument for -c: "$OPTARG"" >&2
+                list_commands
+                exit 1
+            fi
+            ;;
+        'p')
+            modelio_home=${OPTARG}
+            ;;
+	'h')
+            list_commands
+            exit 0
+            ;;
+	\?) echo "Invalid option: $1" >&2
+            list_commands
+            exit 1
+            ;;
+    esac
+done
+shift $((OPTIND-1))
+
+if [[ ! -z $cpus ]] ; then
+    CPUS=$cpus
+fi
+
+if [[ ! -z "${modelio_home}" ]]; then
+      MODELIO_HOME=${modelio_home}
+fi
 
 prog=$(basename $0)
 exec=$(which $prog)
