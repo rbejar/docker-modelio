@@ -1,4 +1,4 @@
-º#!/bin/bash
+#!/bin/bash
 
 # Wrapper that starts the docker run with appropriate bind mounts, etc.
 
